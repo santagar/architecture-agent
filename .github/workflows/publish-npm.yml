@@ -1,0 +1,149 @@
+name: Publish npm package
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      publish_mode:
+        description: "Publish mode: release (uses package.json version) or canary (auto-suffixed prerelease)"
+        required: true
+        default: release
+        type: choice
+        options:
+          - release
+          - canary
+      force_publish:
+        description: "Force publish attempt when checks would skip (cannot override npm immutable versions)"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+
+      - name: Resolve publish mode
+        run: |
+          set -euo pipefail
+          MODE="release"
+          FORCE="false"
+          NPM_TAG="latest"
+
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+            MODE="${{ inputs.publish_mode }}"
+            FORCE="${{ inputs.force_publish }}"
+          fi
+
+          if [[ "${MODE}" == "canary" ]]; then
+            NPM_TAG="canary"
+          fi
+
+          echo "PUBLISH_MODE=${MODE}" >> "$GITHUB_ENV"
+          echo "FORCE_PUBLISH=${FORCE}" >> "$GITHUB_ENV"
+          echo "NPM_TAG=${NPM_TAG}" >> "$GITHUB_ENV"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build distributable CLI
+        run: npm run build
+
+      - name: Run tests
+        run: npm run test
+
+      - name: Run markdown lint
+        run: npm run lint:md
+
+      - name: Read package metadata
+        run: |
+          node <<'NODE' >> "$GITHUB_ENV"
+          const pkg = require('./package.json');
+          console.log(`PKG_NAME=${pkg.name}`);
+          console.log(`PKG_VERSION=${pkg.version}`);
+          NODE
+
+      - name: Apply canary version (manual mode)
+        if: env.PUBLISH_MODE == 'canary'
+        run: |
+          set -euo pipefail
+          BASE_VERSION="${PKG_VERSION}"
+          SUFFIX="${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}"
+
+          if [[ "${BASE_VERSION}" == *-* ]]; then
+            CANARY_VERSION="${BASE_VERSION}.canary.${SUFFIX}"
+          else
+            CANARY_VERSION="${BASE_VERSION}-canary.${SUFFIX}"
+          fi
+
+          npm version "${CANARY_VERSION}" --no-git-tag-version
+          echo "PKG_VERSION=${CANARY_VERSION}" >> "$GITHUB_ENV"
+
+      - name: Show package metadata
+        run: |
+          echo "name=${PKG_NAME}"
+          echo "version=${PKG_VERSION}"
+          echo "mode=${PUBLISH_MODE}"
+          echo "tag=${NPM_TAG}"
+
+      - name: Verify npm auth and scope permissions
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          NPM_USER="$(npm whoami --registry=https://registry.npmjs.org/)"
+          echo "npm whoami: ${NPM_USER}"
+
+          PKG_SCOPE="${PKG_NAME#@}"
+          PKG_SCOPE="${PKG_SCOPE%%/*}"
+
+          if [[ "${PKG_NAME}" == @* ]] && [[ "${PKG_SCOPE}" != "${NPM_USER}" ]]; then
+            echo "Error: token user '${NPM_USER}' does not match package scope '@${PKG_SCOPE}'."
+            echo "Use an npm token from the scope owner account or publish under a scope owned by this token."
+            exit 1
+          fi
+
+          npm ping --registry=https://registry.npmjs.org/
+
+      - name: Skip if version already exists in npm
+        id: npm_version
+        run: |
+          if npm view "${PKG_NAME}@${PKG_VERSION}" version >/dev/null 2>&1; then
+            if [[ "${FORCE_PUBLISH}" == "true" ]]; then
+              echo "Error: ${PKG_NAME}@${PKG_VERSION} already exists. npm versions are immutable."
+              echo "Use a new version or run manual canary mode."
+              exit 1
+            fi
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Package ${PKG_NAME}@${PKG_VERSION} already exists in npm. Skipping publish."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "Package ${PKG_NAME}@${PKG_VERSION} is new. Publishing."
+          fi
+
+      - name: Package dry-run
+        if: steps.npm_version.outputs.exists == 'false'
+        run: npm pack --dry-run
+
+      - name: Publish to npmjs
+        if: steps.npm_version.outputs.exists == 'false'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public --tag "${NPM_TAG}"

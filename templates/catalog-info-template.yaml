@@ -1,0 +1,29 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: <service-name>
+  title: <optional-human-readable-name>
+  description: <short-purpose>
+  tags:
+    - <domain-tag>
+    - <language-tag>
+  links:
+    - title: Runbook
+      url: <runbook-url-or-path>
+    - title: Dashboard
+      url: <dashboard-url-or-path>
+  annotations:
+    # Optional: enrich with organizational hierarchy used by this playbook
+    company.com/solution: <solution-or-product-name>
+    company.com/area: <org-area-or-tribe>
+    company.com/subdomain: <optional-subdomain>
+spec:
+  type: service
+  lifecycle: <experimental|active|production|deprecated>
+  owner: <team-or-group>
+  system: <system-or-domain-name>
+
+# Rules:
+# - Keep `owner`, `lifecycle`, and `system` updated.
+# - If your organization uses custom hierarchy fields (solution/area/subdomain), keep them in annotations.
+# - This file is the primary organizational metadata source for playbook workflows.

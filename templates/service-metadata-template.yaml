@@ -1,0 +1,40 @@
+service:
+  name: "<service-name>"
+  description: "<short-purpose>"
+  # Keep this aligned with catalog-info fields when possible:
+  # - service.name <-> metadata.name
+  # - solution/domain/area/subdomain can map to custom annotations
+  solution: "<solution-or-product-name>"
+  domain: "<business-domain>"
+  subdomain: "<optional-subdomain>"
+  area: "<org-area-or-tribe>"
+
+team:
+  name: "<team-name>"
+  # Keep aligned with `spec.owner` in catalog-info.yaml
+  type: "<squad|platform|stream-aligned|enabling|other>"
+
+ownership:
+  technical_owner: "<person-or-group>"
+  product_owner: "<person-or-group>"
+  oncall: "<oncall-rotation-or-alias>"
+
+lifecycle:
+  # Keep aligned with `spec.lifecycle` in catalog-info.yaml
+  stage: "<experimental|active|production|deprecated>"
+  criticality: "<low|medium|high|critical>"
+  tier: "<tier-1|tier-2|tier-3|other>"
+
+runtime:
+  language: "<primary-language>"
+  platform: "<eks|kubernetes|vm|serverless|other>"
+
+links:
+  runbook: "<optional-url-or-path>"
+  dashboard: "<optional-url-or-path>"
+  backlog: "<optional-url-or-path>"
+
+# Rules:
+# - Use this file as an optional extension when catalog-info.yaml is not enough.
+# - If a field exists in both files and conflicts, catalog-info.yaml wins.
+# - If a field is unknown, set it to "Not found in repository".

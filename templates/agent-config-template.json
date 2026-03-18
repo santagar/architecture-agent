@@ -1,0 +1,7 @@
+{
+  "agentName": "architecture-agent",
+  "agentLocation": "installed npm package @santagar/architecture-agent",
+  "defaultUpdateGitScope": "origin/main~1..origin/main",
+  "defaultOutputLanguage": null,
+  "copyOnLaunch": true
+}

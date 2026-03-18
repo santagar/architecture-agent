@@ -1,0 +1,47 @@
+{
+  "name": "@santagar/architecture-agent",
+  "version": "0.1.0",
+  "description": "CLI package for the AI Architecture Agent playbook",
+  "type": "module",
+  "private": false,
+  "homepage": "https://github.com/santagar/ai-architecture-agent#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/santagar/ai-architecture-agent.git"
+  },
+  "bugs": {
+    "url": "https://github.com/santagar/ai-architecture-agent/issues"
+  },
+  "bin": {
+    "architecture-agent": "dist/architecture-agent.mjs"
+  },
+  "files": [
+    "dist/",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "lint": "npm run lint:md",
+    "lint:md": "npx --yes markdownlint-cli2 \"README.md\" \"prompts/**/*.md\" \"workflows/**/*.md\" \"templates/**/*.md\"",
+    "prepack": "npm run build",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "keywords": [
+    "architecture",
+    "playbook",
+    "ai",
+    "codex",
+    "workflow"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "esbuild": "^0.25.10"
+  }
+}

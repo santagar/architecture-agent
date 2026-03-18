@@ -1,0 +1,32 @@
+name: Workflow gap
+description: Report a missing or weak operational path in the playbook.
+title: "[Workflow Gap] "
+labels:
+  - workflow
+  - triage
+body:
+  - type: input
+    id: scenario
+    attributes:
+      label: Scenario
+      description: Real engineering situation that is not covered well.
+      placeholder: "Update docs + diagrams after external IaC repo changes"
+    validations:
+      required: true
+  - type: textarea
+    id: current
+    attributes:
+      label: Current behavior/gap
+    validations:
+      required: true
+  - type: textarea
+    id: desired
+    attributes:
+      label: Desired workflow outcome
+    validations:
+      required: true
+  - type: textarea
+    id: artifacts
+    attributes:
+      label: Expected artifacts
+      description: Paths/files expected after running the improved flow.

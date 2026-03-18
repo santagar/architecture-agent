@@ -1,0 +1,27 @@
+{
+  "generated_at_utc": "<ISO-8601 UTC timestamp>",
+  "agent": "architecture-agent",
+  "last_workflow": "<workflow-file-name>",
+  "workflow_status": "<completed|partial|blocked>",
+  "scope": "<short scope description>",
+  "output_language": "<language>",
+  "artifacts_updated": [
+    "<path-1>",
+    "<path-2>"
+  ],
+  "external_context": {
+    "repositories": [
+      "<repo-or-url-1>",
+      "<repo-or-url-2>"
+    ],
+    "notes": "<short notes or Not found in repository>"
+  },
+  "open_blockers": [
+    "<blocker-1>",
+    "<blocker-2>"
+  ],
+  "evidence_gaps": [
+    "<gap-1>",
+    "<gap-2>"
+  ]
+}

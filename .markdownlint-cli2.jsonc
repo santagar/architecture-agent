@@ -1,0 +1,24 @@
+{
+  // Strict-enough baseline for this repo:
+  // keep structural quality checks, relax only noisy style constraints.
+  "globs": [
+    "README.md",
+    "prompts/**/*.md",
+    "workflows/**/*.md",
+    "templates/**/*.md"
+  ],
+  "config": {
+    "default": true,
+    // MD013 (line length): relaxed to keep prompts/examples readable and avoid
+    // forced wrapping noise in operational snippets and long paths.
+    "MD013": false,
+    // MD033 (inline HTML): relaxed because templates intentionally use
+    // placeholder syntax like "<Service or Repository Name>".
+    "MD033": false,
+    // MD060 (table-column-style): keep table quality checks, but enforce
+    // "spaced" style used across this repository.
+    "MD060": {
+      "style": "spaced"
+    }
+  }
+}
