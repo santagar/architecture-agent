@@ -1,6 +1,6 @@
 {
   "name": "@santagar/architecture-agent",
-  "version": "0.1.0",
+  "version": "0.1.4",
   "description": "CLI package for the AI Architecture Agent playbook",
   "type": "module",
   "private": false,
