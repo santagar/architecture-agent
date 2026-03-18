@@ -1,6 +1,6 @@
 # AI Architecture Agent
 
-[![CI](https://github.com/santagar/ai-architecture-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/santagar/ai-architecture-agent/actions/workflows/ci.yml)
+[![CI](https://github.com/santagar/architecture-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/santagar/architecture-agent/actions/workflows/ci.yml)
 [![npm version](https://img.shields.io/npm/v/@santagar/architecture-agent)](https://www.npmjs.com/package/@santagar/architecture-agent)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
 
