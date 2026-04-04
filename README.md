@@ -853,7 +853,7 @@ Example progression for a real platform:
 4. Relaunch `06` in `source-mode=repository` or `source-mode=hybrid`
 5. Generate repository reviews plus final `docs/reviews/security/platform-security-assessment.md`
 
-1. Optional VS Code task binding:
+6. Optional VS Code task binding:
 
 Create `.vscode/tasks.json` in the service repo:
 
@@ -1233,5 +1233,8 @@ The value is in making architectural analysis **repeatable, reviewable, and scal
 ## License
 
 MIT. See `LICENSE`.
+
+Metadata history convention:
+
 - `docs/meta.json` should keep the latest snapshot only for quick reading
 - `docs/meta/history/` should keep one JSON file per execution so you can trace what was launched, with which inputs, and which artifacts changed per run
