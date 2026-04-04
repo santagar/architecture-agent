@@ -1118,13 +1118,15 @@ Use `docs/reviews/` groups by analysis lens, not by where code lives.
 | `architecture` | Are architecture boundaries and technical direction coherent? | `architecture-review.md` | When architecture posture or governance-level assessment is needed. |
 | `service` | Is this service behavior sound in a distributed system context? | `microservice-review.md` | When the repo is a service and contract/coupling/resilience depth is needed. |
 | `iac` | Is infrastructure-as-code secure and operable? | `iac-review.md` | When Terraform/Kubernetes/IaC is present or changed. |
-| `security` | Which risks require remediation tracking? | `technical-debt-report.md` | When meaningful security/operability risks are identified. |
+| `security` | What is exposed, how strong are the controls, and which risks require remediation tracking? | `technical-debt-report.md`, `perimeter-security-review.md`, `platform-security-assessment.md`, `platform-security-scorecard.md`, `security-remediation-plan.md`, `security-findings-register.md`, `repository/<repo-name>-security-review.md` | When meaningful security/operability risks are identified, when platform/public exposure must be assessed (`06`), or when repository/component deep dives are justified by evidence. |
 | `governance` | Are deliverables complete and release-ready? | `deliverables-review.md` | At release/readiness checkpoints (`04`). |
 
 Decision rule:
 
 - Start with `repository` for the global baseline.
 - Add specialized subgroups (`architecture`, `service`, `iac`, `security`, `governance`) only when scope requires deeper analysis.
+- Use `security/technical-debt-report.md` for repository-level risk tracking from `01` or `03`.
+- Use the security assessment artifact set from `06` when the scope is platform perimeter, cloud exposure, cross-component security posture, or staged security deep dives.
 
 ### Diagram path convention
 
