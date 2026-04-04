@@ -33,7 +33,7 @@ Validate that repository documentation and review artifacts are complete, consis
 7. If drift is found, run `workflows/01-documentation-lifecycle.md` with `mode=update`.
 8. If major quality/risk gaps are found, update debt items using `templates/technical-debt-report-template.md`.
 9. Record review decision in `docs/reviews/governance/deliverables-review.md` using `templates/deliverables-review-template.md`.
-10. Create or update `docs/meta.json` using `templates/docs-meta-template.json`.
+10. Create or update `docs/meta.json` using `templates/docs-meta-template.json` and write a full execution record to `docs/meta/history/<timestamp-or-id>.json`.
 
 ## Expected outputs
 
@@ -49,7 +49,7 @@ Validate that repository documentation and review artifacts are complete, consis
 - Markdown lint result is recorded in the deliverables review record.
 - Missing or stale artifacts are either updated or tracked with owners/actions.
 - If drift exists, `workflows/01-documentation-lifecycle.md` (`mode=update`) is executed before closing review.
-- `docs/meta.json` is updated with timestamp, last workflow, reviewed artifacts, and open gaps.
+- `docs/meta.json` is updated as the latest snapshot and points to a full execution record under `docs/meta/history/`.
 
 ## Documentation usage notes
 

@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "<ISO-8601 UTC timestamp>",
+  "generated_at_utc": "<ISO-8601 UTC timestamp of latest update>",
   "agent": "architecture-agent",
   "last_workflow": "<workflow-file-name>",
   "workflow_status": "<completed|partial|blocked>",
@@ -23,5 +23,6 @@
   "evidence_gaps": [
     "<gap-1>",
     "<gap-2>"
-  ]
+  ],
+  "latest_execution_ref": "docs/meta/history/<timestamp-or-id>.json"
 }

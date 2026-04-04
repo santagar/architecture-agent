@@ -60,7 +60,7 @@ Default behavior for short launch prompts (for example "execute it fully"):
 20. Ensure README contains `Technical debt status` with one explicit state: `No technical debt identified at this time` or `Technical debt identified` with report reference and short summary.
 21. If meaningful risks are found, run `prompts/security-operability.md` and capture remediation using `templates/technical-debt-report-template.md`.
 22. Use `templates/architecture-review-template.md` to consolidate the result.
-23. Create or update `docs/meta.json` using `templates/docs-meta-template.json`.
+23. Create or update `docs/meta.json` using `templates/docs-meta-template.json` and write a full execution record to `docs/meta/history/<timestamp-or-id>.json`.
 
 ## Expected outputs
 
@@ -81,7 +81,7 @@ Default behavior for short launch prompts (for example "execute it fully"):
 - If Mermaid renderer is unavailable when diagrams are required, workflow is paused with `Context request to user`.
 - Repository score is captured with `templates/repository-scorecard-template.md`.
 - IaC review is always documented in `docs/reviews/iac/iac-review.md` with mode `direct` or `indirect`.
-- `docs/meta.json` is updated with timestamp, mode, scope, updated artifacts, and open blockers/gaps.
+- `docs/meta.json` is updated as the latest snapshot and points to a full execution record under `docs/meta/history/`.
 - Missing evidence is explicitly marked as `Not found in repository`.
 
 ## Documentation usage notes

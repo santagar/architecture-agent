@@ -23,7 +23,7 @@ Build a high-level architecture view across multiple repositories/services with 
 5. Run `prompts/solution-diagram-generation.md`.
 6. Generate `docs/solution/solution-landscape.md` using `templates/solution-landscape-template.md`.
 7. If deep service-level validation is needed, run `workflows/01-documentation-lifecycle.md` on critical repositories (`mode=baseline` for first run, `mode=update` if docs already exist) and refresh solution diagrams.
-8. Create or update `docs/meta.json` using `templates/docs-meta-template.json`.
+8. Create or update `docs/meta.json` using `templates/docs-meta-template.json` and write a full execution record to `docs/meta/history/<timestamp-or-id>.json`.
 
 ## Expected outputs
 
@@ -39,7 +39,7 @@ Build a high-level architecture view across multiple repositories/services with 
 - `docs/solution/diagrams/sources/business-flow.mmd` and `docs/solution/diagrams/rendered/business-flow.svg` exist.
 - `docs/solution/solution-landscape.md` is generated using `templates/solution-landscape-template.md`.
 - Organizational metadata is sourced from `catalog-info.yaml` when available across repositories.
-- `docs/meta.json` is updated with timestamp, last workflow, updated artifacts, and evidence gaps.
+- `docs/meta.json` is updated as the latest snapshot and points to a full execution record under `docs/meta/history/`.
 - Unknown or inaccessible cross-repo evidence is marked as `Not found in repository`.
 
 ## Artifact path convention

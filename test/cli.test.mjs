@@ -36,6 +36,27 @@ test('launch workflow 01 includes retrieval command', () => {
   assert.match(result.stdout, /Then execute workflow `01-documentation-lifecycle\.md`/);
 });
 
+test('launch workflow 06 includes platform security scope guidance', () => {
+  const result = runCli([
+    'launch',
+    'workflow',
+    '06',
+    '--source-mode',
+    'public-surface',
+    '--platform-scope',
+    'payments',
+    '--perimeter-scope',
+    'api.example.com',
+    '--no-copy'
+  ]);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /npx architecture-agent show workflows 06/);
+  assert.match(result.stdout, /Source mode: "public-surface"\./);
+  assert.match(result.stdout, /Platform scope: "payments"\./);
+  assert.match(result.stdout, /Perimeter scope: "api\.example\.com"\./);
+  assert.match(result.stdout, /public URLs\/domains\/docs without requiring repository code/);
+});
+
 test('invalid launch type fails with usage hint', () => {
   const result = runCli(['launch', 'invalid', '01']);
   assert.equal(result.status, 1);

@@ -77,6 +77,7 @@ Run the playbook in this order:
 3. `01-documentation-lifecycle` (`mode=update` after merges/implemented changes)
 4. `04-review-deliverables` (recommended before release/governance checkpoints)
 5. `05-solution-landscape` (when you need a multi-repo or system view)
+6. `06-platform-security-assessment` (when you need perimeter-first platform security assessment and remediation planning)
 
 ## Agent essence
 
@@ -113,6 +114,7 @@ Use this folder when you want to perform an end-to-end activity such as:
 - keeping README and documentation aligned with merged Git changes using `01` in `mode=update`
 - producing targeted review/debt artifacts only when change scope requires them
 - validating deliverables completeness before release or governance review
+- assessing platform security from public exposure through internal repositories and shared components
 
 ### `templates/`
 
@@ -200,6 +202,37 @@ Operational rule:
 - `workflows/03-resolve-technical-debt.md`: reduce technical debt and prioritize quality/security hardening.
 - `workflows/04-review-deliverables.md`: validate that docs/reviews are complete and aligned.
 - `workflows/05-solution-landscape.md`: build a multi-repository business and architecture view.
+- `workflows/06-platform-security-assessment.md`: assess platform security posture starting from public exposure and then drilling into internal repositories/components.
+
+### 2.1 How to use one specific workflow
+
+Use this same pattern for any workflow:
+
+1. Pick the workflow file by intent.
+2. Decide the minimum input it needs.
+3. Generate a launch instruction from terminal with `npx architecture-agent launch workflow <id> ...` or write the launch block manually.
+4. Paste that launch text into your AI assistant chat in the target repository.
+5. Let the assistant retrieve the workflow source and execute it fully.
+
+Minimum input by workflow:
+
+- `01`: usually just the repository; optionally `mode=baseline` or `mode=update` plus `Git scope`
+- `02`: a free-text `Change request`
+- `03`: usually no extra input; optionally constraints about risk, scope, or priorities
+- `04`: optional review scope such as release candidate, governance review, or pre-merge validation
+- `05`: `System scope` plus related repositories and interfaces when available
+- `06`: `Platform scope` plus `source-mode` and public targets or repositories/components in scope
+
+Fast terminal examples:
+
+```bash
+npx architecture-agent launch workflow 01 --mode update --git-scope origin/main~1..origin/main
+npx architecture-agent launch workflow 02 --change-request "Extract shared currency helper"
+npx architecture-agent launch workflow 03
+npx architecture-agent launch workflow 04
+npx architecture-agent launch workflow 05 --system-scope "payments-domain" --related-repo "checkout-service" --related-repo "payment-orchestrator"
+npx architecture-agent launch workflow 06 --source-mode public-surface --platform-scope "payments-platform" --perimeter-scope "https://api.example.com, https://checkout.example.com"
+```
 
 ### 3. Launch with an explicit instruction
 
@@ -244,6 +277,98 @@ Use `workflows/05-solution-landscape.md` to generate a multi-repository solution
 System scope: "<system-or-domain-name>".
 Related repositories: <repo-a>, <repo-b>.
 ```
+
+```text
+Agent: architecture-agent (in parent directories of the current repository)
+Use `workflows/06-platform-security-assessment.md` to assess platform security.
+Source mode: "public-surface".
+Platform scope: "<platform-or-product-name>".
+Perimeter scope: "<public-domains-endpoints-entry-points>".
+```
+
+Recommended interpretation for that launch:
+
+- use `06` when you need a staged security assessment from perimeter to repositories, platform components, and cloud controls
+- start with `Battery A: Perimeter Exposure Review`
+- work from public URLs, domains, public docs, and observable entry points even if repository code is not available
+- generate severity-based findings and a prioritized remediation view
+- produce a deep-dive queue for the most critical repositories/components
+- continue with `Battery B` and `Battery C` only where evidence and risk justify it
+- if cloud controls are in scope, include `prompts/cloud-security-posture-review.md`
+
+Choose the source mode by available evidence:
+
+- `public-surface`: start from public URLs, domains, endpoints, apps, or documentation without requiring repository code
+- `repository`: work directly from one or more repositories/components already identified
+- `hybrid`: combine public exposure analysis with repository/component deep dives
+
+Interpret infrastructure and cloud evidence as first-class context:
+
+- use Kubernetes or IaC publication evidence to distinguish intentional exposure from real misconfiguration
+- examples: `Ingress`, `Gateway`, `HTTPRoute`, `VirtualService`, `Service`, `Helm values`, `Certificate`, `ExternalDNS`, `NetworkPolicy`
+- use cloud evidence to distinguish expected publication patterns from real cloud security failures
+- examples: ALB/NLB, API Gateway, CloudFront/CDN, WAF, IAM, Secrets Manager, security groups, public storage, audit/detection controls
+- score the controls around exposure, not just the fact that a service is public
+
+Expected artifacts:
+
+- `docs/reviews/security/perimeter-security-review.md`
+- `docs/reviews/security/platform-security-assessment.md`
+- `docs/reviews/security/platform-security-scorecard.md`
+- `docs/reviews/security/security-remediation-plan.md`
+- `docs/reviews/security/security-findings-register.md`
+- `docs/reviews/security/repository/<repo-name>-security-review.md`
+- `docs/meta.json`
+
+Artifact intent:
+
+- `perimeter-security-review.md`: what is publicly exposed, what was observed, and which checks should go deeper next
+- `platform-security-assessment.md`: concise executive assessment with top findings, current posture, and recommended next battery
+- `platform-security-scorecard.md`: security score, maturity band, confidence, and next-check triggers
+- `security-remediation-plan.md`: short prioritized execution plan with sequencing and ownership direction
+- `security-findings-register.md`: durable register of findings for tracking and governance
+- `repository/<repo-name>-security-review.md`: deep-dive output for the highest-risk repositories or shared components
+
+Scoring approach:
+
+- `06` uses a lightweight control-area score from `0-5` per area and converts it to an overall `0-100` score
+- the goal is comparability and prioritization, not formal certification
+- always state confidence and evidence gaps alongside the score
+
+Concrete launch examples:
+
+Public perimeter only:
+
+```bash
+npx architecture-agent launch workflow 06 \
+  --source-mode public-surface \
+  --platform-scope "payments-platform" \
+  --perimeter-scope "https://pay.example.com, https://api.example.com, https://checkout.example.com"
+```
+
+Repository-first deep dive:
+
+```bash
+npx architecture-agent launch workflow 06 \
+  --source-mode repository \
+  --platform-scope "payments-platform" \
+  --perimeter-scope "api-gateway, checkout-service, payment-orchestrator"
+```
+
+Hybrid progression:
+
+```bash
+npx architecture-agent launch workflow 06 \
+  --source-mode hybrid \
+  --platform-scope "payments-platform" \
+  --perimeter-scope "https://api.example.com, checkout-service, payment-orchestrator"
+```
+
+Suggested output interpretation:
+
+- `public-surface`: start by producing `docs/reviews/security/perimeter-security-review.md`
+- `repository`: start by producing one or more `docs/reviews/security/repository/<repo-name>-security-review.md`
+- `hybrid`: use perimeter findings to prioritize repository deep dives, then consolidate into `docs/reviews/security/platform-security-assessment.md`
 
 #### Implicit defaults for the shortest launch
 
@@ -297,7 +422,7 @@ Git scope: origin/main~1..origin/main (default: last change on main; or `working
 Refresh README and diagrams (`sources/*.mmd` + `rendered/*.svg`) when affected.
 Always refresh `docs/reviews/iac/iac-review.md` with mode `direct` or `indirect`.
 If `catalog-info.yaml` changed in the Git scope, refresh organizational metadata sections too.
-Update `docs/meta.json` with workflow status and changed artifacts.
+Update `docs/meta.json` with workflow status and changed artifacts, and write the full run record to `docs/meta/history/<timestamp-or-id>.json`.
 Output language: English. (optional)
 ```
 
@@ -347,6 +472,23 @@ Write artifacts to:
 If evidence is missing, write "Not found in repository".
 Output language: English. (optional)
 ```
+
+Recommended interpretation by workflow:
+
+- `01-documentation-lifecycle`:
+  use it to produce or refresh the repository baseline. Expect `README.md`, diagrams, scorecards, review artifacts, and `docs/meta.json` to stay aligned with the current repository evidence.
+- `01-documentation-lifecycle` in `mode=update`:
+  use it after merges, releases, or meaningful local changes. Keep Git scope small so the workflow updates only the artifacts affected by that change window.
+- `02-change-request`:
+  use it for a concrete implementation request. Expect a minimal safe slice first, with documentation refresh only when architecture, delivery/runtime, dependencies, or execution flow actually changed.
+- `03-resolve-technical-debt`:
+  use it when you want prioritized hardening instead of a free-form refactor. Expect one next safe debt-reduction slice plus refreshed debt/reporting artifacts.
+- `04-review-deliverables`:
+  use it as a release or governance gate. Expect a decision record, explicit gaps, and either acceptance or a focused loop back into `01` when artifacts are incomplete or stale.
+- `05-solution-landscape`:
+  use it when the system boundary is bigger than one repository. Expect a multi-repo business/architecture view, cross-repository interfaces, solution diagrams, and an explicit list of assumptions where evidence is missing.
+- `06-platform-security-assessment`:
+  use it when you need a staged security assessment from public perimeter to repositories, platform components, and cloud controls. Expect a perimeter-first review, scorecard, remediation plan, findings register, and deeper batteries only where evidence justifies them.
 
 ### 3.1 Default documentation preservation (built-in)
 
@@ -679,7 +821,8 @@ Clipboard copy is enabled by default in that file. To disable:
     "agent:launch:02": "architecture-agent launch workflow 02 --change-request \"<your free-text request>\"",
     "agent:launch:03": "architecture-agent launch workflow 03",
     "agent:launch:04": "architecture-agent launch workflow 04",
-    "agent:launch:05": "architecture-agent launch workflow 05 --system-scope \"<system-or-domain-name>\" --related-repo \"<repo-a>\" --related-repo \"<repo-b>\""
+    "agent:launch:05": "architecture-agent launch workflow 05 --system-scope \"<system-or-domain-name>\" --related-repo \"<repo-a>\" --related-repo \"<repo-b>\"",
+    "agent:launch:06": "architecture-agent launch workflow 06 --source-mode public-surface --platform-scope \"<platform-or-product-name>\" --perimeter-scope \"<public-domains-endpoints-entry-points>\""
   }
 }
 ```
@@ -692,6 +835,23 @@ Clipboard copy is enabled by default in that file. To disable:
 - copy the generated text output
 - paste it into your Codex/ChatGPT IDE chat
 - execute and let the model run the referenced workflow in the current repository
+
+Example for platform security:
+
+- run `npm run agent:launch:06`
+- use `source-mode=public-surface` when you only have public targets
+- set platform scope to the platform or product name
+- set perimeter scope to public domains, APIs, apps, or entry points
+- produce the perimeter report first
+- continue with `source-mode=repository` or `source-mode=hybrid` only where the first pass justifies deeper review
+
+Example progression for a real platform:
+
+1. `npm run agent:launch:06` with `source-mode=public-surface`
+2. Generate `docs/reviews/security/perimeter-security-review.md`
+3. Pick the most critical repositories/components from the deep-dive queue
+4. Relaunch `06` in `source-mode=repository` or `source-mode=hybrid`
+5. Generate repository reviews plus final `docs/reviews/security/platform-security-assessment.md`
 
 1. Optional VS Code task binding:
 
@@ -748,6 +908,12 @@ These are output locations in the target repository.
 
 - `README.md`
 - `docs/meta.json`
+- `docs/reviews/security/perimeter-security-review.md`
+- `docs/reviews/security/platform-security-assessment.md`
+- `docs/reviews/security/platform-security-scorecard.md`
+- `docs/reviews/security/security-remediation-plan.md`
+- `docs/reviews/security/security-findings-register.md`
+- `docs/reviews/security/repository/<repo-name>-security-review.md`
 - `catalog-info.yaml` (recommended metadata source)
 - `docs/metadata/service-metadata.yaml` (optional metadata extension)
 - `docs/diagrams/sources/*.mmd`
@@ -910,7 +1076,7 @@ Use `prompts/documentation-source-of-truth.md` as the standard way to keep repos
   - `No technical debt identified at this time`, or
   - `Technical debt identified` with link/reference to `docs/reviews/security/technical-debt-report.md` plus short summary.
 - Refresh it after architectural changes, change-execution milestones, or major operational changes.
-- Update `docs/meta.json` at the end of each documentation workflow (`01`, `05`).
+- Update `docs/meta.json` at the end of each documentation workflow (`01`, `05`) and write the full execution record under `docs/meta/history/`.
 - For post-merge updates, use `workflows/01-documentation-lifecycle.md` with `mode=update`.
 - Before release/governance checkpoints, run `workflows/04-review-deliverables.md`.
 
@@ -1067,3 +1233,5 @@ The value is in making architectural analysis **repeatable, reviewable, and scal
 ## License
 
 MIT. See `LICENSE`.
+- `docs/meta.json` should keep the latest snapshot only for quick reading
+- `docs/meta/history/` should keep one JSON file per execution so you can trace what was launched, with which inputs, and which artifacts changed per run
